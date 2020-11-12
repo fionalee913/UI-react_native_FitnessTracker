@@ -13,6 +13,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { TouchableOpacity, Image, View, Text } from 'react-native';
+import HomePage from './HomePage';
 
 class App extends React.Component {
 
@@ -54,9 +55,9 @@ class App extends React.Component {
    */
   SignoutButton = () => {
     return <>
-      <View style={{ flexDirection: 'row', marginRight: 25 }}>
-        <TouchableOpacity onPress={() => alert("We should probably change this to log us out! An icon would be nice too!")}>
-          <Text> X</Text>
+      <View style={{ flexDirection: 'row', marginRight: 10, marginLeft: 10 }}>
+        <TouchableOpacity onPress={() => this.revokeAccessToken()}>
+          <Text> Sign Out </Text>
         </TouchableOpacity>
       </View>
     </>
@@ -109,13 +110,30 @@ class App extends React.Component {
             </>
           ) : (
               <>
-                <AuthStack.Screen name="FitnessTracker" options={{
-                  headerLeft: this.SignoutButton
+                <AuthStack.Screen name="Home" options={{
+                  headerRight: this.SignoutButton
+                }}>
+                  {(props) => <HomePage {...props} username={this.state.username} accessToken={this.state.accessToken} />}
+                </AuthStack.Screen>
+              
+                <AuthStack.Screen name="Profile" options={{
+                  headerRight: this.SignoutButton
                 }}>
                   {(props) => <ProfileView {...props} username={this.state.username} accessToken={this.state.accessToken} revokeAccessToken={this.revokeAccessToken} />}
                 </AuthStack.Screen>
-              </>
+              
+                <AuthStack.Screen name="Exercises" options={{
+                  headerRight: this.SignoutButton
+                }}>
+                  {(props) => <ExercisesView {...props} username={this.state.username} accessToken={this.state.accessToken} />}
+                </AuthStack.Screen>
 
+                <AuthStack.Screen name="Today" options={{
+                  headerRight: this.SignoutButton
+                }}>
+                  {(props) => <TodayView {...props} username={this.state.username} accessToken={this.state.accessToken} />}
+                </AuthStack.Screen>
+              </>
             )}
         </AuthStack.Navigator>
       </NavigationContainer>
