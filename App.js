@@ -6,6 +6,7 @@ import SignupView from './SignupView';
 import TodayView from './TodayView'
 import ExercisesView from './ExercisesView'
 import ProfileView from './ProfileView'
+import GoalView from './GoalView'
 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -62,6 +63,8 @@ class App extends React.Component {
     </>
   }
 
+  
+
   /**
    * Note that there are many ways to do navigation and this is just one!
    * I chose this way as it is likely most familiar to us, passing props
@@ -76,6 +79,42 @@ class App extends React.Component {
    */
   render() {
 
+    let profileStack = createStackNavigator();
+    const profileStackScreen = () => {
+    return (
+      <profileStack.Navigator>
+        <profileStack.Screen name="Profile" options={{ headerRight: this.SignoutButton }}>
+        {(props) => <ProfileView {...props} username={this.state.username} accessToken={this.state.accessToken} revokeAccessToken={this.revokeAccessToken} />}
+        </profileStack.Screen>
+      </profileStack.Navigator>
+      );
+    }
+
+    let exerciseStack = createStackNavigator();
+    const exerciseStackScreen = () => {
+    return (
+      <exerciseStack.Navigator>
+        <exerciseStack.Screen name="Exercises" options={{ headerRight: this.SignoutButton }}>
+        {(props) => <ExercisesView {...props} username={this.state.username} accessToken={this.state.accessToken} revokeAccessToken={this.revokeAccessToken} />}
+        </exerciseStack.Screen>
+      </exerciseStack.Navigator>
+      );
+    }
+
+    let todayStack = createStackNavigator();
+    const todayStackScreen = ({navigation}) => {
+    return (
+      <todayStack.Navigator>
+        <todayStack.Screen name="Today" options={{ headerRight: this.SignoutButton }}>
+        {(props) => <TodayView {...props} username={this.state.username} accessToken={this.state.accessToken} revokeAccessToken={this.revokeAccessToken} navigation={navigation}/>}
+        </todayStack.Screen>
+        <todayStack.Screen name="Goals">
+        {(props) => <GoalView {...props} username={this.state.username} accessToken={this.state.accessToken} revokeAccessToken={this.revokeAccessToken} navigation={navigation}/>}
+        </todayStack.Screen>
+      </todayStack.Navigator>
+      );
+    }
+
     // Our primary navigator between the pre and post auth views
     // This navigator switches which screens it navigates based on
     // the existent of an access token. In the authorized view,
@@ -84,6 +123,7 @@ class App extends React.Component {
     // list of tabs for the Today, Exercises, and Profile views.
     let AuthStack = createStackNavigator();
     let Tab = createBottomTabNavigator();
+    
 
     return (
       <NavigationContainer>
@@ -110,22 +150,11 @@ class App extends React.Component {
             </AuthStack.Navigator>
           ) : (
               <Tab.Navigator>
-                <Tab.Screen name="Profile" >
-                  {(props) => <ProfileView {...props} username={this.state.username} accessToken={this.state.accessToken} revokeAccessToken={this.revokeAccessToken} />}
-                  
-                </Tab.Screen>
+                <Tab.Screen name="Profile" component={profileStackScreen}/>
               
-                <Tab.Screen name="Exercises" options={{
-                  headerRight: this.SignoutButton
-                }}>
-                  {(props) => <ExercisesView {...props} username={this.state.username} accessToken={this.state.accessToken} />}
-                </Tab.Screen>
+                <Tab.Screen name="Exercises" component={exerciseStackScreen}/>
 
-                <Tab.Screen name="Today" options={{
-                  headerRight: this.SignoutButton
-                }}>
-                  {(props) => <TodayView {...props} username={this.state.username} accessToken={this.state.accessToken} />}
-                </Tab.Screen>
+                <Tab.Screen name="Today" component={todayStackScreen}/>
               </Tab.Navigator>
             )}
       </NavigationContainer>

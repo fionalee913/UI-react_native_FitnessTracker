@@ -16,6 +16,7 @@ class ExercisesView extends React.Component {
             edit: false, 
             mode: "",
             pick: false,
+            remove: false,
         }
         this.getAllExercises = this.getAllExercises.bind(this);
         this.addExercise = this.addExercise.bind(this);
@@ -120,13 +121,12 @@ class ExercisesView extends React.Component {
                     }}/>
                     <View style={styles.spaceHorizontal} />
                     <Button title="Remove" onPress={() => {
-                        this.setState({id: item.id});
-                        this.deleteExercise(item.id);
+                        this.setState({id: item.id, remove: true});
                     }}/>
                     </View>
+                    
                 </View>
             )}
-            
             </>
         )
     }
@@ -266,6 +266,21 @@ class ExercisesView extends React.Component {
                       </View>
                     </View>
                 </Modal>
+                <Modal visible={this.state.remove}>
+                        <View style={styles.centeredView}>
+                          <Text>Remove this exercise?</Text>
+                          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
+                            <Button title="Remove" onPress={()=> {
+                              this.deleteExercise(this.state.id);
+                              this.setState({remove: false});
+                            }}/>
+                            <View style={styles.spaceHorizontal} />
+                            <Button title="Cancel" onPress={()=> {
+                              this.setState({remove: false});
+                            }}/>
+                            </View>
+                        </View>
+                    </Modal>
         <View style={styles.space} />
       </ScrollView>
         )
