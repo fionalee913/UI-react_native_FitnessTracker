@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View, Button, TextInput, ScrollView, Dimensions, Modal, FlatList, List, SafeAreaView } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 class ExercisesView extends React.Component {
     constructor(props) {
@@ -9,10 +10,12 @@ class ExercisesView extends React.Component {
             name: "",
             duration: 0.0,
             calories: 0.0,
-            date: "",
+            date: new Date(),
             exercises: [],
             add: false,
             edit: false, 
+            mode: "",
+            pick: false,
         }
         this.getAllExercises = this.getAllExercises.bind(this);
         this.addExercise = this.addExercise.bind(this);
@@ -126,8 +129,19 @@ class ExercisesView extends React.Component {
         )
     }
 
-    
+    onChange = (event, selectedDate) => {
+      const currentDate = selectedDate || this.state.date;
+      this.setState({pick: Platform.OS === 'ios'});
+      this.setState({date: currentDate});
+    };
 
+    showMode = (currentMode) => {
+      var date = new Date();
+      this.setState({ date });
+      this.setState({pick: true});
+      this.setState({mode: currentMode});
+    };
+   
     componentDidMount() {
         
     }
@@ -146,7 +160,6 @@ class ExercisesView extends React.Component {
                 
                 <Modal visible={this.state.add} >
                     <View style={styles.centeredView}>
-                    <View style={styles.modalView}>
                     <Text>Activity name:</Text> 
                     <TextInput style={styles.input}
                         placeholderTextColor="#d9bebd"
@@ -166,18 +179,34 @@ class ExercisesView extends React.Component {
                             value={this.state.calories}
                             autoCapitalize="none" />
                         <Text>Date: </Text>
-                        <TextInput style={styles.input}
-                            placeholderTextColor="#d9bebd"
-                            onChangeText={(date) => this.setState({ date: date })}
+                        <View>
+                        <View>
+                          <Button onPress={()=> {
+                            console.log(this.state.date);
+                            this.showMode('date');
+                          }} title="Show date picker!" />
+                        </View>
+                        <View>
+                          <Button onPress={()=> this.showMode('time')} title="Show time picker!" />
+                        </View>
+                        {this.state.pick && (
+                          <DateTimePicker
+                            testID="dateTimePicker"
                             value={this.state.date}
-                            autoCapitalize="none" />
+                            mode={this.state.mode}
+                            is24Hour={true}
+                            display="default"
+                            onChange={this.onChange}
+                            style={{width: 350}}
+                          />
+                        )}
+                      </View>
 
                         <Button title="Add" onPress={() => {
                             this.addExercise();
                             this.setState({add: false});
                         }}/>
                         <Button title="Close" onPress={() => this.setState({add: false})}/>
-                    </View>
                     </View>
                 </Modal>
                 <Modal visible={this.state.edit} >
@@ -276,10 +305,10 @@ const styles = StyleSheet.create({
         marginTop: 22
       },
       modalView: {
-        margin: 20,
+        margin: 5,
         backgroundColor: "white",
-        borderRadius: 20,
-        padding: 35,
+        borderRadius: 10,
+        padding: 40,
         alignItems: "center",
         shadowColor: "#000",
         shadowOffset: {
