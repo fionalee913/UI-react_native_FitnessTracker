@@ -107,6 +107,7 @@ class ExercisesView extends React.Component {
                     <Text>Date: {item.date}</Text>
                     <Text>Duration: {item.duration}</Text>
                     <Text>Calories burned: {item.calories}</Text>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
                     <Button title="Edit" onPress={() => {
                         this.setState({ 
                             id: item.id,
@@ -117,11 +118,12 @@ class ExercisesView extends React.Component {
                             edit: true,
                         });
                     }}/>
+                    <View style={styles.spaceHorizontal} />
                     <Button title="Remove" onPress={() => {
                         this.setState({id: item.id});
                         this.deleteExercise(item.id);
                     }}/>
-                    
+                    </View>
                 </View>
             )}
             
@@ -153,10 +155,10 @@ class ExercisesView extends React.Component {
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                     <Text style={styles.bigText}>Exercises</Text>
                     </View>
-                    
+                
                 <View style={styles.space} />
+                <Button color="#a1635f" style={styles.buttonInline} title="Add Exercises" onPress={() => this.setState({add: true})} />
                 {this.getAllExercises()}
-                <Button color="#a1635f" style={styles.buttonInline} title="Add" onPress={() => this.setState({add: true})} />
                 
                 <Modal visible={this.state.add} >
                     <View style={styles.centeredView}>
@@ -170,25 +172,19 @@ class ExercisesView extends React.Component {
                         <TextInput style={styles.input}
                             placeholderTextColor="#d9bebd"
                             onChangeText={(duration) => this.setState({ duration: duration })}
-                            value={this.state.duration}
+                            value={this.state.duration.toString()}
                             autoCapitalize="none" />
                         <Text>Calories burned: </Text>
                         <TextInput style={styles.input}
                             placeholderTextColor="#d9bebd"
                             onChangeText={(calories) => this.setState({ calories: calories })}
-                            value={this.state.calories}
+                            value={this.state.calories.toString()}
                             autoCapitalize="none" />
-                        <Text>Date: </Text>
-                        <View>
-                        <View>
-                          <Button onPress={()=> {
-                            console.log(this.state.date);
-                            this.showMode('date');
-                          }} title="Show date picker!" />
-                        </View>
-                        <View>
-                          <Button onPress={()=> this.showMode('time')} title="Show time picker!" />
-                        </View>
+                          <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                          <Button color="#942a21" style={styles.buttonInline} onPress={()=> this.showMode('date')} title="Set date" />
+                          <View style={styles.spaceHorizontal} />
+                          <Button color="#942a21" style={styles.buttonInline} onPress={()=> this.showMode('time')} title="Set time" />
+                          <View style={styles.space} />
                         {this.state.pick && (
                           <DateTimePicker
                             testID="dateTimePicker"
@@ -200,18 +196,25 @@ class ExercisesView extends React.Component {
                             style={{width: 350}}
                           />
                         )}
-                      </View>
-
-                        <Button title="Add" onPress={() => {
+                        </View>
+                        <View style={styles.space} />
+                        <Text style={{alignItems: 'center'}}>Current time: </Text>
+                        <Text>{this.state.date.toString()}</Text>
+                      <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                        <Button color="#942a21" style={styles.buttonInline} title="Add" onPress={() => {
+                            this.setState({
+                              name: "", duration: 0.0, calories: 0.0, pick: false,
+                            })
                             this.addExercise();
                             this.setState({add: false});
                         }}/>
-                        <Button title="Close" onPress={() => this.setState({add: false})}/>
+                        <View style={styles.spaceHorizontal} />
+                        <Button color="#942a21" style={styles.buttonInline} title="Close" onPress={() => this.setState({add: false, pick: false})}/>
+                      </View>
                     </View>
                 </Modal>
                 <Modal visible={this.state.edit} >
                     <View style={styles.centeredView}>
-                    <View style={styles.modalView}>
                     <Text>Activity name:</Text> 
                     <TextInput style={styles.input}
                         placeholderTextColor="#d9bebd"
@@ -224,22 +227,43 @@ class ExercisesView extends React.Component {
                             placeholderTextColor="#d9bebd"
                             placeholder={this.state.duration.toString()}
                             onChangeText={(duration) => this.setState({ duration: duration })}
-                            value={this.state.duration}
+                            value={this.state.duration.toString()}
                             autoCapitalize="none" />
                         <Text>Calories burned: </Text>
                         <TextInput style={styles.input}
                             placeholderTextColor="#d9bebd"
                             placeholder={this.state.calories.toString()}
                             onChangeText={(calories) => this.setState({ calories: calories })}
-                            value={this.state.calories}
+                            value={this.state.calories.toString()}
                             autoCapitalize="none" />
-                        <Text>Date: {this.state.date}</Text>
-                        <Button title="Save" onPress={() => {
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                          <Button color="#942a21" style={styles.buttonInline} onPress={()=> this.showMode('date')} title="Set date" />
+                          <View style={styles.spaceHorizontal} />
+                          <Button color="#942a21" style={styles.buttonInline} onPress={()=> this.showMode('time')} title="Set time" />
+                          <View style={styles.space} />
+                        {this.state.pick && (
+                          <DateTimePicker
+                            testID="dateTimePicker"
+                            value={this.state.date}
+                            mode={this.state.mode}
+                            is24Hour={true}
+                            display="default"
+                            onChange={this.onChange}
+                            style={{width: 350}}
+                          />
+                        )}
+                        </View>
+                        <View style={styles.space} />
+                        <Text style={{alignItems: 'center'}}>Current time: </Text>
+                        <Text>{this.state.date.toString()}</Text>
+                      <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                        <Button color="#942a21" style={styles.buttonInline} title="Save" onPress={() => {
                             this.editExercise(this.state.id);
-                            this.setState({edit: false});
+                            this.setState({edit: false, pick: false});
                         }}/>
-                        <Button title="Close" onPress={() => this.setState({edit: false})}/>
-                    </View>
+                        <View style={styles.spaceHorizontal} />
+                        <Button color="#942a21" style={styles.buttonInline} title="Close" onPress={() => this.setState({edit: false, pick: false})}/>
+                      </View>
                     </View>
                 </Modal>
         <View style={styles.space} />

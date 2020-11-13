@@ -13,7 +13,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { TouchableOpacity, Image, View, Text } from 'react-native';
-import HomePage from './HomePage';
 
 class App extends React.Component {
 
@@ -84,12 +83,13 @@ class App extends React.Component {
     // need to specify another set of screens or navigator; e.g. a
     // list of tabs for the Today, Exercises, and Profile views.
     let AuthStack = createStackNavigator();
+    let Tab = createBottomTabNavigator();
 
     return (
       <NavigationContainer>
-        <AuthStack.Navigator>
+        
           {!this.state.accessToken ? (
-            <>
+            <AuthStack.Navigator>
               <AuthStack.Screen
                 name="SignIn"
                 options={{
@@ -107,35 +107,27 @@ class App extends React.Component {
               >
                 {(props) => <SignupView {...props} />}
               </AuthStack.Screen>
-            </>
+            </AuthStack.Navigator>
           ) : (
-              <>
-                <AuthStack.Screen name="Home" options={{
-                  headerRight: this.SignoutButton
-                }}>
-                  {(props) => <HomePage {...props} username={this.state.username} accessToken={this.state.accessToken} />}
-                </AuthStack.Screen>
-              
-                <AuthStack.Screen name="Profile" options={{
-                  headerRight: this.SignoutButton
-                }}>
+              <Tab.Navigator>
+                <Tab.Screen name="Profile" >
                   {(props) => <ProfileView {...props} username={this.state.username} accessToken={this.state.accessToken} revokeAccessToken={this.revokeAccessToken} />}
-                </AuthStack.Screen>
+                  
+                </Tab.Screen>
               
-                <AuthStack.Screen name="Exercises" options={{
+                <Tab.Screen name="Exercises" options={{
                   headerRight: this.SignoutButton
                 }}>
                   {(props) => <ExercisesView {...props} username={this.state.username} accessToken={this.state.accessToken} />}
-                </AuthStack.Screen>
+                </Tab.Screen>
 
-                <AuthStack.Screen name="Today" options={{
+                <Tab.Screen name="Today" options={{
                   headerRight: this.SignoutButton
                 }}>
                   {(props) => <TodayView {...props} username={this.state.username} accessToken={this.state.accessToken} />}
-                </AuthStack.Screen>
-              </>
+                </Tab.Screen>
+              </Tab.Navigator>
             )}
-        </AuthStack.Navigator>
       </NavigationContainer>
     );
   }
