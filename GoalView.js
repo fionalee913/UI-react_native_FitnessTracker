@@ -26,30 +26,7 @@ class GoalView extends React.Component {
         }
     }
     
-    getActivityMin() {
-        fetch('https://mysqlcs639.cs.wisc.edu/activities', {
-            method: 'GET',
-            headers: { 'x-access-token': this.props.accessToken }
-        })
-      .then(res => res.json())
-      .then(res => {
-        this.setState({
-          exercises: res.activities
-        });
-      });
-      let date = new Date();
-      var exercises = this.state.exercises.filter((item) => {
-        return moment(item.date).format('YYYY-MM-DD') === moment(date).format('YYYY-MM-DD');
-        });
-        var totalTime = 0;
-        exercises.forEach((item) => {
-            totalTime += item.duration;
-        })
-        return totalTime;
-    }
-
-
-    Grid() {
+    componentDidMount() {
         fetch('https://mysqlcs639.cs.wisc.edu/users/' + this.props.username, {
       method: 'GET',
       headers: { 'x-access-token': this.props.accessToken }
@@ -64,7 +41,31 @@ class GoalView extends React.Component {
           goalMin: res.goalDailyActivity
         });
       });
+      let date = new Date();
+      fetch('https://mysqlcs639.cs.wisc.edu/activities', {
+            method: 'GET',
+            headers: { 'x-access-token': this.props.accessToken }
+        })
+      .then(res => res.json())
+      .then(res => {
+        this.setState({
+          exercises: res.activities.filter((item) => {
+            return moment(item.date).format('YYYY-MM-DD') === moment(date).format('YYYY-MM-DD');
+            })
+        });
+      });
+    }
+    
+    getActivityMin = () => {
+        var totalTime = 0;
+        this.state.exercises.forEach((item) => {
+            totalTime += item.duration;
+        })
+        return totalTime;
+    }
 
+
+    Grid = () => {
         return (
           <View style={styles.gridContainer}>
             <View style={styles.rowStyle}>
@@ -148,9 +149,7 @@ class GoalView extends React.Component {
             </View>
             )}*/
 
-    componentDidMount() {
-        
-    }
+
 
     render() {
         return (

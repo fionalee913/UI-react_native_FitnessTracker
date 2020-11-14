@@ -27,7 +27,20 @@ class TodayView extends React.Component {
         }
     }
 
-    addExercise() {
+    componentDidMount() {
+        fetch('https://mysqlcs639.cs.wisc.edu/activities', {
+            method: 'GET',
+            headers: { 'x-access-token': this.props.accessToken }
+        })
+      .then(res => res.json())
+      .then(res => {
+        this.setState({
+          exercises: res.activities
+        });
+      });
+    }
+
+    addExercise = () => {
         fetch('https://mysqlcs639.cs.wisc.edu/activities', {
             method: 'POST',
             headers: { 
@@ -38,7 +51,7 @@ class TodayView extends React.Component {
                 name: this.state.name,
                 duration: this.state.duration,
                 calories: this.state.calories,
-                date: this.state.date
+                date: moment(this.state.date).format()
             })
         })
       .then(res => res.json())
@@ -49,7 +62,7 @@ class TodayView extends React.Component {
       });
     }
 
-    deleteExercise(id) {
+    deleteExercise = (id) => {
         fetch(`https://mysqlcs639.cs.wisc.edu/activities/` + id, {
         method: 'DELETE',
         headers: {
@@ -65,7 +78,7 @@ class TodayView extends React.Component {
       })
     }
 
-    editExercise(id) {
+    editExercise = (id) => {
         fetch(`https://mysqlcs639.cs.wisc.edu/activities/` + id, {
             method: 'PUT',
             headers: { 
@@ -87,22 +100,13 @@ class TodayView extends React.Component {
       });
     }
 
-    getAllExercises() {
-        fetch('https://mysqlcs639.cs.wisc.edu/activities', {
-            method: 'GET',
-            headers: { 'x-access-token': this.props.accessToken }
-        })
-      .then(res => res.json())
-      .then(res => {
-        this.setState({
-          exercises: res.activities
-        });
-      });
-      let date = new Date();
+    getAllExercises = () => {
+        
+      var date = new Date();
 
         return (
             <>
-            {this.state.exercises = this.state.exercises.filter((item) => {
+            { this.state.exercises.filter((item) => {
                 return moment(item.date).format('YYYY-MM-DD') === moment(date).format('YYYY-MM-DD');
             }).map((item) => 
             <View style={styles.item} key={item.id}>
@@ -135,20 +139,15 @@ class TodayView extends React.Component {
 
     onChange = (event, selectedDate) => {
         const currentDate = selectedDate || this.state.date;
-        this.setState({pick: Platform.OS === 'ios'});
         this.setState({date: currentDate});
       };
   
       showMode = (currentMode) => {
-        var date = new Date();
-        this.setState({ date });
-        this.setState({pick: true});
+        this.setState({pick: Platform.OS === 'ios'});
         this.setState({mode: currentMode});
-      };
+      };  
 
-    componentDidMount() {
-        
-    }
+   
 
     render() {
         return (
@@ -203,17 +202,17 @@ class TodayView extends React.Component {
                         </View>
                         <View style={styles.space} />
                         <Text style={{alignItems: 'center'}}>Current time: </Text>
-                        <Text>{this.state.date.toString()}</Text>
+                        <Text>{moment(new Date()).format()}</Text>
                       <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                         <Button color="#942a21" style={styles.buttonInline} title="Add" onPress={() => {
                             this.setState({
-                              name: "", duration: 0.0, calories: 0.0, pick: false,
+                              name: "", duration: 0.0, calories: 0.0, pick: false, add: false,
                             })
                             this.addExercise();
-                            this.setState({add: false});
                         }}/>
                         <View style={styles.spaceHorizontal} />
-                        <Button color="#942a21" style={styles.buttonInline} title="Close" onPress={() => this.setState({add: false, pick: false})}/>
+                        <Button color="#942a21" style={styles.buttonInline} title="Close" 
+                            onPress={() => this.setState({add: false, pick: false, name: "", duration: 0.0, calories: 0.0,})}/>
                       </View>
                     </View>
                 </Modal>
@@ -258,15 +257,16 @@ class TodayView extends React.Component {
                         )}
                         </View>
                         <View style={styles.space} />
-                        <Text style={{alignItems: 'center'}}>Current time: </Text>
-                        <Text>{this.state.date.toString()}</Text>
+                        <Text style={{alignItems: 'center'}}>Date: </Text>
+                        <Text>{moment(this.state.date).format()}</Text>
                       <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                         <Button color="#942a21" style={styles.buttonInline} title="Save" onPress={() => {
                             this.editExercise(this.state.id);
-                            this.setState({edit: false, pick: false});
+                            this.setState({edit: false, pick: false, name: "", duration: 0.0, calories: 0.0,});
                         }}/>
                         <View style={styles.spaceHorizontal} />
-                        <Button color="#942a21" style={styles.buttonInline} title="Close" onPress={() => this.setState({edit: false, pick: false})}/>
+                        <Button color="#942a21" style={styles.buttonInline} title="Close" 
+                            onPress={() => this.setState({edit: false, pick: false, name: "", duration: 0.0, calories: 0.0,})}/>
                       </View>
                     </View>
                 </Modal>

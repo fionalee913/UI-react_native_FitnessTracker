@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, Button, TextInput, ScrollView, Dimensions, Modal, FlatList, List, SafeAreaView } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import moment from 'moment';
 
 class ExercisesView extends React.Component {
     constructor(props) {
@@ -23,6 +24,19 @@ class ExercisesView extends React.Component {
         this.deleteExercise = this.deleteExercise.bind(this);
     }
 
+    componentDidMount() {
+      fetch('https://mysqlcs639.cs.wisc.edu/activities', {
+        method: 'GET',
+        headers: { 'x-access-token': this.props.accessToken }
+    })
+    .then(res => res.json())
+    .then(res => {
+      this.setState({
+        exercises: res.activities
+      });
+    });
+    }
+
     addExercise() {
         fetch('https://mysqlcs639.cs.wisc.edu/activities', {
             method: 'POST',
@@ -34,7 +48,7 @@ class ExercisesView extends React.Component {
                 name: this.state.name,
                 duration: this.state.duration,
                 calories: this.state.calories,
-                date: this.state.date
+                date: moment(this.state.date).format()
             })
         })
       .then(res => res.json())
@@ -72,7 +86,7 @@ class ExercisesView extends React.Component {
                 name: this.state.name,
                 duration: this.state.duration,
                 calories: this.state.calories,
-                date: this.state.date
+                date: this.state.date,
             })
         })
       .then(res => res.json())
@@ -88,16 +102,7 @@ class ExercisesView extends React.Component {
     }
 
     getAllExercises() {
-        fetch('https://mysqlcs639.cs.wisc.edu/activities', {
-            method: 'GET',
-            headers: { 'x-access-token': this.props.accessToken }
-        })
-      .then(res => res.json())
-      .then(res => {
-        this.setState({
-          exercises: res.activities
-        });
-      });
+        
 
         return (
             <>
@@ -113,7 +118,7 @@ class ExercisesView extends React.Component {
                         this.setState({ 
                             id: item.id,
                             name: item.name,
-                            date: item.date,
+                            date: new Date(item.date),
                             duration: item.duration, 
                             calories: item.calories,
                             edit: true,
@@ -133,20 +138,15 @@ class ExercisesView extends React.Component {
 
     onChange = (event, selectedDate) => {
       const currentDate = selectedDate || this.state.date;
-      this.setState({pick: Platform.OS === 'ios'});
       this.setState({date: currentDate});
     };
 
     showMode = (currentMode) => {
-      var date = new Date();
-      this.setState({ date });
-      this.setState({pick: true});
+      this.setState({pick: Platform.OS === 'ios'});
       this.setState({mode: currentMode});
     };
    
-    componentDidMount() {
-        
-    }
+
 
     render() {
         return (
@@ -199,17 +199,17 @@ class ExercisesView extends React.Component {
                         </View>
                         <View style={styles.space} />
                         <Text style={{alignItems: 'center'}}>Current time: </Text>
-                        <Text>{this.state.date.toString()}</Text>
+                        <Text>{moment(new Date()).format()}</Text>
                       <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                         <Button color="#942a21" style={styles.buttonInline} title="Add" onPress={() => {
                             this.setState({
-                              name: "", duration: 0.0, calories: 0.0, pick: false,
+                              name: "", duration: 0.0, calories: 0.0, pick: false, add: false,
                             })
                             this.addExercise();
-                            this.setState({add: false});
                         }}/>
                         <View style={styles.spaceHorizontal} />
-                        <Button color="#942a21" style={styles.buttonInline} title="Close" onPress={() => this.setState({add: false, pick: false})}/>
+                        <Button color="#942a21" style={styles.buttonInline} title="Close" 
+                          onPress={() => this.setState({add: false, pick: false, name: "", duration: 0.0, calories: 0.0,})}/>
                       </View>
                     </View>
                 </Modal>
@@ -254,15 +254,16 @@ class ExercisesView extends React.Component {
                         )}
                         </View>
                         <View style={styles.space} />
-                        <Text style={{alignItems: 'center'}}>Current time: </Text>
-                        <Text>{this.state.date.toString()}</Text>
+                        <Text style={{alignItems: 'center'}}>Date: </Text>
+                        <Text>{moment(this.state.date).format()}</Text>
                       <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                         <Button color="#942a21" style={styles.buttonInline} title="Save" onPress={() => {
                             this.editExercise(this.state.id);
-                            this.setState({edit: false, pick: false});
+                            this.setState({edit: false, pick: false, name: "", duration: 0.0, calories: 0.0,});
                         }}/>
                         <View style={styles.spaceHorizontal} />
-                        <Button color="#942a21" style={styles.buttonInline} title="Close" onPress={() => this.setState({edit: false, pick: false})}/>
+                        <Button color="#942a21" style={styles.buttonInline} title="Close" 
+                          onPress={() => this.setState({edit: false, pick: false, name: "", duration: 0.0, calories: 0.0,})}/>
                       </View>
                     </View>
                 </Modal>
@@ -272,11 +273,11 @@ class ExercisesView extends React.Component {
                           <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
                             <Button title="Remove" onPress={()=> {
                               this.deleteExercise(this.state.id);
-                              this.setState({remove: false});
+                              this.setState({remove: false, name: "", duration: 0.0, calories: 0.0,});
                             }}/>
                             <View style={styles.spaceHorizontal} />
                             <Button title="Cancel" onPress={()=> {
-                              this.setState({remove: false});
+                              this.setState({remove: false, name: "", duration: 0.0, calories: 0.0,});
                             }}/>
                             </View>
                         </View>

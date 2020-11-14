@@ -57,14 +57,13 @@ class App extends React.Component {
     return <>
       <View style={{ flexDirection: 'row', marginRight: 10, marginLeft: 10 }}>
         <TouchableOpacity onPress={() => this.revokeAccessToken()}>
-          <Text> Sign Out </Text>
+          <Text> Log Out </Text>
         </TouchableOpacity>
       </View>
     </>
   }
 
-  
-
+ 
   /**
    * Note that there are many ways to do navigation and this is just one!
    * I chose this way as it is likely most familiar to us, passing props
@@ -108,7 +107,7 @@ class App extends React.Component {
         <todayStack.Screen name="Today" options={{ headerRight: this.SignoutButton }}>
         {(props) => <TodayView {...props} username={this.state.username} accessToken={this.state.accessToken} revokeAccessToken={this.revokeAccessToken} navigation={navigation}/>}
         </todayStack.Screen>
-        <todayStack.Screen name="Goals">
+        <todayStack.Screen name="Goals" options={{ headerRight: this.SignoutButton }}>
         {(props) => <GoalView {...props} username={this.state.username} accessToken={this.state.accessToken} revokeAccessToken={this.revokeAccessToken} navigation={navigation}/>}
         </todayStack.Screen>
       </todayStack.Navigator>
@@ -149,12 +148,12 @@ class App extends React.Component {
               </AuthStack.Screen>
             </AuthStack.Navigator>
           ) : (
-              <Tab.Navigator>
-                <Tab.Screen name="Profile" component={profileStackScreen}/>
+              <Tab.Navigator >
+                <Tab.Screen name="Profile" component={profileStackScreen} options={{tabBarIcon: ({color, size}) => <Ionicons name="ios-person" color={color} size={size}/>}}/>
               
-                <Tab.Screen name="Exercises" component={exerciseStackScreen}/>
+                <Tab.Screen name="Exercises" component={exerciseStackScreen} options={{tabBarIcon: ({color, size}) => <Ionicons name="ios-bicycle" color={color} size={size}/>}}/>
 
-                <Tab.Screen name="Today" component={todayStackScreen}/>
+                <Tab.Screen name="Today" component={todayStackScreen} options={{tabBarIcon: ({color, size}) => <Ionicons name="ios-today" color={color} size={size}/>}}/>
               </Tab.Navigator>
             )}
       </NavigationContainer>
